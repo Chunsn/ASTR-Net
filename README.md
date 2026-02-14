@@ -1,4 +1,4 @@
-#This is the code repository for the paper "ASTR-Net: Attentive Spatial-Temporal Refinement Network for Personalized EEG Source Imaging".
+# This is the code repository for the paper "ASTR-Net: Attentive Spatial-Temporal Refinement Network for Personalized EEG Source Imaging".
 ![ASTR-Net 网络结构图](images/fig2.png)
 The repository provides the required network architecture and main function code.
 
