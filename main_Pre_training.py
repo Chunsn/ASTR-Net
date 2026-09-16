@@ -218,7 +218,6 @@ def main():
                 result_root + '/model_best.pth.tar')
 
         if args.save:
-            # 保存检查点
             torch.save({
                 'epoch': epoch,
                 'arch': args.arch,
@@ -294,7 +293,7 @@ def train(train_loader, model, criterion, optimizer, args_params):
         out = model_output
 
         loss = criterion(out, nmm)
-        loss.backward() # 计算梯度
+        loss.backward() 
 
         
         original_total_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=max_norm)
