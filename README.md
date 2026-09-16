@@ -2,6 +2,6 @@
 ![ASTR-Net 网络结构图](images/fig2.png)
 The repository provides the required network architecture and main function code.
 
-1. To enable personalized training head models, please modify the `--fwd` attribute in `main.py` and select the personalized lead array located in `Personalized Training`.
-2. The lead array and simulation data used for model pre-training are based on the dataset provided by DeepSIF. [Please visit](https://github.com/bfinl/DeepSIF) We cite this work in this paper and express our gratitude herein.
+1. The lead array and simulation data used for model pre-training are based on the dataset provided by DeepSIF. [Please visit](https://github.com/bfinl/DeepSIF) We cite this work in this paper and express our gratitude herein.
+2. The main function for conducting pre-training is main_Pre_training.py, and the dataset used is leadfield_75_20k.mat. The pre-training employs the early stopping mechanism.
 3. To implement the two-stage fine-tuning, please adjust the following two parameters in `main.py`: `lr_spatial` and `lr_temporal`. These parameters control the spatial and temporal modules, respectively.
