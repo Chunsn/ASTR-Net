@@ -1,5 +1,3 @@
-## DeepSIF: Train Data Generation
-
 ### The Virtual Brain Simulation
 ```bash
 python generate_tvb_data.py --a_start 0 --a_end 10
