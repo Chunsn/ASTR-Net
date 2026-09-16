@@ -16,9 +16,7 @@ import networkASTRNet
 
 def main():
     start_time = time.time()
-    # ======================= 1. 解析输入参数 =========================================================================
     parser = argparse.ArgumentParser(description='ASTR Model Training')
-    # --- 常规参数 ---
     parser.add_argument('--save', type=int, default=True, help='Save checkpoint for each epoch or not')
     parser.add_argument('--workers', default=2, type=int, help='Number of data loading workers')
     parser.add_argument('--batch_size', default=24, type=int, help='Batch size')
@@ -34,7 +32,6 @@ def main():
                         help='Lead-field subject ID, e.g. sub02 or 2')
     parser.add_argument('--info', default='', type=str,
                         help='Optional run note; defaults to the resolved subject ID')
-    # --- 第二阶段个体化微调参数 ---
     parser.add_argument('--finetune_path', type=str,
                         default='model_result/2026-8.06-jichu_the_model/model_best.pth.tar',
                         help='Best standard-head checkpoint used to initialize fine-tuning')
@@ -78,7 +75,6 @@ def main():
         args.model_id = f'weitiao_{args.subject}_ES'
     if not args.info:
         args.info = args.subject
-    # ======================= 2. 准备环境和日志 ========================================================================
     use_cuda = torch.cuda.is_available()
     device = torch.device(args.device if use_cuda else "cpu")
     print(f"Using device: {device}")
@@ -88,7 +84,6 @@ def main():
     if not os.path.exists(result_root):
         os.makedirs(result_root)
 
-    # 配置日志记录器
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     handler = logging.FileHandler(os.path.join(result_root, f'outputs_{args.arch}.log'))
@@ -97,10 +92,9 @@ def main():
     logger.info(f"============================= {datetime.datetime.now()} ====================================")
     logger.info(f"Training data is {args.train}, and validation data is {args.test}")
     for v, val in args.__dict__.items():
-        if v not in ['workers']: # 记录所有重要参数
+        if v not in ['workers']: 
             logger.info(f'{v} is {val}')
 
-    # ================================== 3. 加载数据 =================================================================
     print("Loading forward matrix...")
     fwd_path = os.path.join('anatomy', args.fwd)
     if not os.path.isfile(fwd_path):
@@ -116,7 +110,6 @@ def main():
     test_data = loaders3.__dict__[args.dat](os.path.join(data_root, args.test), fwd=fwd, args_params={'dataset_len': 6000})
     test_loader = DataLoader(test_data, batch_size=args.batch_size, num_workers=args.workers, pin_memory=False)
 
-    # ================================== 4. 创建模型和优化器 (核心逻辑) ===============================================
     net = networkASTRNet.__dict__[args.arch]().to(device)
     
     # Build optimizer/scheduler first. Their states will be restored as well when --resume is used.
@@ -229,23 +222,20 @@ def main():
     print(f'\nNumber of trainable parameters: {net.count_parameters()}')
     print(f'Preparation time: {time.time() - start_time:.2f} seconds\n')
 
-    # =============================== 5. 训练循环 ======================================================================
     for epoch in range(args.start_epoch + 1, args.epoch + 1):
         epoch_start_time = time.time()
 
-        # 在一个epoch上训练
         train_lss_all = train(train_loader, net, criterion, optimizer, {'device': device, 'logger': logger})
         
-        # 在验证集上评估
         test_lss_all = validate(test_loader, net, criterion, {'device': device})
         
         train_loss.append(train_lss_all)
         test_loss.append(test_lss_all)
         
-        # 更新学习率
+
         lr_scheduler.step(test_lss_all)
 
-        # 打印并记录日志
+
         spatial_lr = optimizer.param_groups[0]['lr']
         temporal_lr = optimizer.param_groups[1]['lr']
         print_s = (f"Epoch {epoch}/{args.epoch} [{time.time() - epoch_start_time:.2f}s] | "
@@ -255,7 +245,6 @@ def main():
         logger.info(print_s)
         print(print_s)
 
-        # 检查是否是最佳模型
         current_validation_loss = float(test_loss[-1])
         is_best = current_validation_loss < best_result
         is_significant_improvement = current_validation_loss < (
@@ -281,7 +270,7 @@ def main():
                 'early_stopping_counter': early_stopping_counter,
                 'train_loss': train_loss,
                 'test_loss': test_loss,
-                'args': args # 保存所有参数以供复现
+                'args': args 
             }, os.path.join(result_root, 'model_best.pth.tar'))
 
         early_stopping_message = (
@@ -293,7 +282,6 @@ def main():
         logger.info(early_stopping_message)
         print(early_stopping_message)
 
-        # 保存周期性检查点
         if args.save:
             torch.save({
                 'epoch': epoch,
