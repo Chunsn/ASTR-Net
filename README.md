@@ -14,4 +14,5 @@ After segmentation, run the following MATLAB script located in the `personalized
 
 ```matlab
 run_pilot_personalized_leadfields.m
+
 4. To implement the two-stage fine-tuning, please adjust the following two parameters in `main_Fine_tuning.py`: `lr_spatial` and `lr_temporal`. These parameters control the spatial and temporal modules, respectively.
